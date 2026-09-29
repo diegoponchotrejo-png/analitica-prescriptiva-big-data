@@ -1,0 +1,19 @@
+=== SISTEMA PRESCRIPTIVO DE INVENTARIO ===
+Productos analizados: 10
+Reponer: 6
+Mantener: 1
+Revisar sobrestock: 3
+
+Recomendaciones:
+
+           producto  stock_actual  punto_reorden      recomendacion  cantidad_sugerida
+Audifonos Bluetooth             8             22            REPONER                 39
+   Bocina Bluetooth             9             21            REPONER                 31
+        Mouse Gamer            12             24            REPONER                 43
+     Adaptador HDMI            14             16            REPONER                 16
+         Power Bank            20             27            REPONER                 30
+        Cable USB-C            25             32            REPONER                 49
+   Teclado Mecanico            35             17           MANTENER                  0
+        Base Laptop            48             17 REVISAR SOBRESTOCK                  0
+          Webcam HD            60             14 REVISAR SOBRESTOCK                  0
+   Memoria USB 64GB            75             22 REVISAR SOBRESTOCK                  0

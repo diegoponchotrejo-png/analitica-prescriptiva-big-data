@@ -1,0 +1,11 @@
+producto,stock_actual,ventas_ultimos_30_dias,stock_minimo,tiempo_reposicion_dias,demanda_diaria,demanda_durante_reposicion,punto_reorden,recomendacion,cantidad_sugerida,justificacion
+Audifonos Bluetooth,8,72,10,5,2.4,12.0,22,REPONER,39,Stock (8) <= punto de reorden (22); hay riesgo de faltante.
+Bocina Bluetooth,9,54,10,6,1.8,10.8,21,REPONER,31,Stock (9) <= punto de reorden (21); hay riesgo de faltante.
+Mouse Gamer,12,90,12,4,3.0,12.0,24,REPONER,43,Stock (12) <= punto de reorden (24); hay riesgo de faltante.
+Adaptador HDMI,14,39,8,6,1.3,7.8,16,REPONER,16,Stock (14) <= punto de reorden (16); hay riesgo de faltante.
+Power Bank,20,66,12,7,2.2,15.4,27,REPONER,30,Stock (20) <= punto de reorden (27); hay riesgo de faltante.
+Cable USB-C,25,120,20,3,4.0,12.0,32,REPONER,49,Stock (25) <= punto de reorden (32); hay riesgo de faltante.
+Teclado Mecanico,35,40,8,7,1.33,9.31,17,MANTENER,0,Stock (35) se encuentra por encima del punto de reorden (17).
+Base Laptop,48,25,10,8,0.83,6.64,17,REVISAR SOBRESTOCK,0,Stock (48) es alto frente al punto de reorden (17) y la demanda reciente.
+Webcam HD,60,18,8,10,0.6,6.0,14,REVISAR SOBRESTOCK,0,Stock (60) es alto frente al punto de reorden (14) y la demanda reciente.
+Memoria USB 64GB,75,45,15,5,1.5,7.5,22,REVISAR SOBRESTOCK,0,Stock (75) es alto frente al punto de reorden (22) y la demanda reciente.

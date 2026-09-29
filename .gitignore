@@ -2,3 +2,10 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# Datasets grandes generados localmente
+data/inventario_sintetico.csv
+data/eventos_ventas.jsonl
+
+# Gráficas generadas durante la ejecución
+docs/evidencias/*.png

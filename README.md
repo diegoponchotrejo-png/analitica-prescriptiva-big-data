@@ -2,42 +2,187 @@
 
 ## ¿Qué debería hacerse?
 
-Este proyecto es una práctica sencilla para demostrar el concepto de **analítica prescriptiva**. El caso elegido es la **reposición de inventario**.
+Este proyecto demuestra un caso de **analítica prescriptiva aplicada a inventarios**. El sistema recibe datos de productos, valida su calidad, calcula indicadores de reposición y genera una recomendación concreta para apoyar la decisión de compra.
 
-La idea es que el sistema no solamente muestre lo que pasó con las ventas, sino que analice los datos y recomiende una acción concreta para cada producto.
+La idea principal es:
+
+**Datos → Limpieza → Análisis → Resultado → Recomendación → Acción**
 
 ## Problema
 
-Una tienda tiene diferentes productos y necesita decidir cuáles debe reponer primero. Si únicamente revisamos el stock actual, podemos equivocarnos porque un producto con pocas unidades puede venderse muy lento, mientras otro con más unidades puede agotarse rápido.
+Una tienda necesita decidir qué productos debe reponer, cuáles puede mantener y cuáles podrían tener exceso de inventario.
 
-Por eso usamos también:
+Para tomar la decisión usamos:
 
+- stock actual;
 - ventas de los últimos 30 días;
-- stock mínimo;
+- stock mínimo o stock de seguridad;
 - tiempo de reposición;
-- demanda diaria estimada.
+- demanda diaria estimada;
+- punto de reorden;
+- nivel objetivo de inventario.
 
-## Flujo del proyecto
+## Analítica prescriptiva
 
-**Datos → Análisis → Resultado → Recomendación → Acción**
+La analítica descriptiva responde **qué ocurrió**.
 
-1. **Datos:** se lee el archivo CSV del inventario.
-2. **Análisis:** se calcula la demanda diaria y el punto de reorden.
-3. **Resultado:** se compara el stock actual contra ese punto.
-4. **Recomendación:** el sistema indica `REPONER`, `MANTENER` o `REVISAR SOBRESTOCK`.
-5. **Acción:** cuando se recomienda reponer, también se calcula una cantidad sugerida.
+La analítica predictiva responde **qué podría ocurrir**.
 
-## Reglas de decisión
+La analítica prescriptiva responde **qué debería hacerse**.
 
-- Si el stock actual es menor o igual al punto de reorden, se recomienda **REPONER**.
-- Si existe demasiado inventario comparado con la demanda, se recomienda **REVISAR SOBRESTOCK**.
-- En los demás casos se recomienda **MANTENER**.
+En este proyecto, la parte prescriptiva aparece cuando el sistema recomienda una acción:
 
-El punto de reorden se calcula con:
+- **REPONER**
+- **MANTENER**
+- **REVISAR SOBRESTOCK**
 
-`demanda durante el tiempo de reposición + stock mínimo`
+## Fórmulas principales
 
-## Estructura
+### Demanda diaria
+
+```text
+demanda_diaria = ventas_ultimos_30_dias / 30
+```
+
+### Demanda durante el tiempo de reposición
+
+```text
+demanda_lead_time = demanda_diaria × tiempo_reposicion_dias
+```
+
+### Punto de reorden
+
+```text
+punto_reorden = demanda_lead_time + stock_minimo
+```
+
+En esta práctica, `stock_minimo` funciona como stock de seguridad.
+
+### Cantidad sugerida
+
+Se eliminó el porcentaje arbitrario de 35%. Ahora se utiliza una política explícita de cobertura:
+
+```text
+nivel_objetivo =
+stock_minimo +
+demanda_diaria × (tiempo_reposicion_dias + 7)
+```
+
+Los 7 días representan una semana adicional de cobertura y pueden modificarse en `DIAS_COBERTURA_EXTRA`.
+
+Cuando hay que reponer:
+
+```text
+cantidad_sugerida = nivel_objetivo - stock_actual
+```
+
+## Calidad de datos
+
+Antes de analizar, el programa revisa:
+
+- columnas obligatorias;
+- valores nulos;
+- productos duplicados;
+- valores negativos;
+- tiempos de reposición inválidos.
+
+Esto evita generar recomendaciones utilizando datos incorrectos.
+
+## Big Data y las 5 V
+
+El proyecto incluye documentación específica en:
+
+```text
+docs/5v_big_data.md
+```
+
+Resumen:
+
+- **Volumen:** se puede generar un dataset sintético de 100,000, 500,000 o más registros.
+- **Velocidad:** se simulan eventos de ventas que podrían llegar continuamente.
+- **Variedad:** se utilizan CSV y JSONL.
+- **Veracidad:** se valida y limpia la información antes de analizarla.
+- **Valor:** los datos terminan convirtiéndose en recomendaciones de negocio.
+
+Importante: el proyecto es una **demostración académica**. Generar muchos registros no significa que una sola computadora se convierta automáticamente en una plataforma Big Data de producción. La arquitectura está preparada conceptualmente para explicar cómo escalaría.
+
+## Dataset pequeño y dataset grande
+
+Para explicar fácilmente el programa se conserva:
+
+```text
+data/inventario.csv
+```
+
+con 10 productos.
+
+Para demostrar volumen se puede generar un dataset sintético:
+
+```bash
+python src/generar_dataset.py --registros 100000 --eventos 20000
+```
+
+Esto genera:
+
+```text
+data/inventario_sintetico.csv
+data/eventos_ventas.jsonl
+```
+
+Los archivos grandes no se suben a GitHub porque pueden volver innecesariamente pesado el repositorio. El código permite recrearlos.
+
+## Procesamiento de mayor volumen
+
+También se incluye un ejemplo de lectura por bloques:
+
+```bash
+python src/procesar_por_chunks.py --data data/inventario_sintetico.csv --chunk 20000
+```
+
+Esto procesa el archivo en partes en lugar de cargar todos los registros de una sola vez.
+
+No es procesamiento distribuido, pero demuestra una técnica útil cuando aumenta el volumen. En un entorno empresarial, la misma idea podría migrarse a tecnologías como Apache Spark.
+
+## Gráficas
+
+Al ejecutar el proyecto se generan:
+
+- `docs/evidencias/grafica_recomendaciones.png`
+- `docs/evidencias/grafica_stock_vs_reorden.png`
+
+Sirven para mostrar visualmente:
+
+- cuántos productos están en cada recomendación;
+- cómo se compara el stock actual con el punto de reorden.
+
+## Metodología
+
+La metodología completa está en:
+
+```text
+docs/metodologia.md
+```
+
+Incluye:
+
+1. extracción;
+2. limpieza y validación;
+3. transformación;
+4. análisis;
+5. generación de recomendación;
+6. presentación de resultados.
+
+## Arquitectura
+
+La arquitectura se encuentra en:
+
+```text
+docs/arquitectura.md
+```
+
+Se explica tanto la arquitectura de la práctica como una posible evolución hacia una arquitectura de mayor escala con almacenamiento distribuido y procesamiento tipo Spark.
+
+## Estructura del repositorio
 
 ```text
 analitica-prescriptiva-big-data/
@@ -45,7 +190,9 @@ analitica-prescriptiva-big-data/
 ├── README.md
 ├── requirements.txt
 ├── src/
-│   └── main.py
+│   ├── main.py
+│   ├── generar_dataset.py
+│   └── procesar_por_chunks.py
 │
 ├── data/
 │   ├── inventario.csv
@@ -53,85 +200,117 @@ analitica-prescriptiva-big-data/
 │
 ├── docs/
 │   ├── arquitectura.md
+│   ├── 5v_big_data.md
+│   ├── metodologia.md
+│   ├── referencias.md
 │   └── evidencias/
+│       ├── README.md
 │       ├── ejecucion.txt
 │       └── resultado_recomendaciones.csv
 │
 └── .gitignore
 ```
 
-## Requisitos
+## Instalación
+
+Requisitos:
 
 - Python 3.10 o superior.
 - pip.
 
-## Instalación
+Clonar:
 
 ```bash
 git clone https://github.com/diegoponchotrejo-png/analitica-prescriptiva-big-data.git
 cd analitica-prescriptiva-big-data
+```
+
+Crear entorno virtual:
+
+```bash
 python -m venv .venv
 ```
 
-En Windows PowerShell:
+Windows PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-Instalar dependencias:
+Instalar:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Ejecución
+## Ejecución básica
 
 ```bash
 python src/main.py
 ```
 
-El programa muestra las recomendaciones en terminal y genera:
+## Ejecución con dataset grande
 
-```text
-docs/evidencias/resultado_recomendaciones.csv
+Primero:
+
+```bash
+python src/generar_dataset.py --registros 100000 --eventos 20000
+```
+
+Después:
+
+```bash
+python src/main.py --data data/inventario_sintetico.csv
 ```
 
 ## Demostración para la exposición
 
-1. **Problema:** decidir qué productos se deben reponer.
-2. **Datos:** abrir `data/inventario.csv`.
+Seguir este orden:
+
+1. **Problema:** decidir qué productos reponer.
+2. **Datos:** explicar las columnas del dataset.
 3. **Arquitectura/solución:** mostrar `docs/arquitectura.md`.
-4. **Código:** abrir `src/main.py`.
-5. **Ejecución:** correr `python src/main.py`.
-6. **Resultados:** revisar las recomendaciones y el CSV.
-7. **Interpretación:** explicar por qué algunos productos deben reponerse y otros no.
-
-## ¿Dónde está la analítica prescriptiva?
-
-La parte prescriptiva aparece cuando el sistema convierte el análisis en una recomendación concreta. No se queda solamente en “este producto vendió 90 unidades”, sino que indica qué hacer con ese producto.
+4. **Código:** explicar `src/main.py`.
+5. **Ejecución:** correr el programa.
+6. **Resultados:** revisar CSV y gráficas.
+7. **Interpretación:** justificar por qué el sistema recomienda cada acción.
 
 ## Ventajas
 
-- Fácil de entender y ejecutar.
-- Las recomendaciones tienen una justificación visible.
-- Relaciona datos históricos con una decisión.
-- Puede ampliarse con más reglas o modelos.
+- Recomendaciones justificables.
+- Fórmulas más claras y configurables.
+- Validación de calidad de datos.
+- Dataset sintético para demostrar volumen.
+- Soporte de CSV y JSONL para explicar variedad.
+- Gráficas para interpretar resultados.
+- Procesamiento por chunks para mostrar manejo de archivos grandes.
+- Proyecto reproducible desde GitHub.
 
 ## Limitaciones
 
-- El dataset es pequeño y didáctico.
-- Las reglas son simplificadas.
-- No considera promociones, estacionalidad, costos, proveedores o cambios repentinos de demanda.
-- En un sistema real se necesitarían más datos y validaciones.
+- La práctica no implementa infraestructura Big Data distribuida real.
+- El dataset sintético no sustituye datos empresariales reales.
+- La demanda diaria se estima mediante un promedio simple.
+- No se modelan estacionalidad, promociones, costos de pedido o restricciones de proveedor.
+- La regla de sobrestock es una heurística simplificada.
+
+## Referencias
+
+Consultar:
+
+```text
+docs/referencias.md
+```
+
+Se incluyen referencias de IBM para las 5 V y documentación de Oracle sobre punto de reorden e inventarios.
 
 ## Conclusión
 
-La analítica prescriptiva sirve para convertir datos en acciones. En este proyecto, los datos de inventario se transforman en recomendaciones concretas para apoyar la decisión de reponer, mantener o revisar productos.
+El proyecto muestra cómo pasar de datos de inventario a una decisión concreta. También refuerza la relación con Big Data mediante volumen sintético, variedad de formatos, validación de calidad, procesamiento por bloques y una arquitectura conceptual escalable.
 
 ## Integrantes
 
-Agregar aquí los nombres de los integrantes del equipo antes de entregar.
+Agregar aquí los nombres de los integrantes del equipo.
 
 ## Conclusiones individuales
 

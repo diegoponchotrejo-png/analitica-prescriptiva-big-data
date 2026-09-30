@@ -159,6 +159,7 @@ def generar_graficas(resultado: pd.DataFrame) -> None:
     plt.ylabel("Número de productos")
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / "grafica_recomendaciones.png", dpi=150)
+    plt.savefig(OUTPUT_DIR / "grafica_recomendaciones.svg")
     plt.close()
 
     muestra = resultado.head(20).copy()
@@ -173,6 +174,7 @@ def generar_graficas(resultado: pd.DataFrame) -> None:
     plt.legend()
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / "grafica_stock_vs_reorden.png", dpi=150)
+    plt.savefig(OUTPUT_DIR / "grafica_stock_vs_reorden.svg")
     plt.close()
 
 

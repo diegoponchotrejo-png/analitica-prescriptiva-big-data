@@ -310,8 +310,8 @@ El proyecto muestra cómo pasar de datos de inventario a una decisión concreta.
 
 ## Integrantes
 
-Agregar aquí los nombres de los integrantes del equipo.
+diego alfonso trejo arellano, Franko ignacio del toro fernandez
 
-## Conclusiones individuales
 
-Cada integrante debe agregar su propia conclusión antes de la entrega final.
+
+
